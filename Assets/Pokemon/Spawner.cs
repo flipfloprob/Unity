@@ -24,7 +24,7 @@ public class Spawner : MonoBehaviour {
 			newPokemon.AddComponent<PokemonWild>();
 			newPokemon.name = prefab.name;
 			int thisLevel = level + Random.Range(-2,3);
-			newPokemon.GetComponent<PokemonObj>().pokemon = new Pokemon(Pokemon.GetNumber(newPokemon.name), thisLevel);
+			newPokemon.GetComponent<PokemonObj>().pokemon = new Pokemon(Pokemon.GetNumber(newPokemon.name), false, thisLevel);
 			spawned.Add(newPokemon);
 		}
 	}

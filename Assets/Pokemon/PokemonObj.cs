@@ -6,6 +6,7 @@ public class PokemonObj : MonoBehaviour {
 	public Vector3 velocity = Vector3.zero;
 	public Pokemon pokemon = null;
 	bool returning = false;
+	GameGUI gamegui = new GameGUI();
 
 	void Update(){
 		velocity -= rigidbody.velocity;
@@ -28,7 +29,12 @@ public class PokemonObj : MonoBehaviour {
 
 	public void Return(){
 		if (returning)	return;
-		if (Player.pokemonObj==gameObject)	Player.pokemonActive = false;
+		if (Player.pokemonObj == gameObject) {
+			Player.pokemonActive = false;
+			//gamegui.SetChatWindow(gameObject.GetComponent<Pokeball>().pokemon.GetName() + "! Return!");
+			//gamegui.SetChatWindow(Player.pokemonObj.GetComponent<Pokeball>().pokemon.GetName() + "! Return!");
+			gamegui.SetChatWindow(pokemon.GetName() + "! Return!");
+		}
 		returning = true;
 		GameObject effect = (GameObject)Instantiate(Resources.Load("ReturnEffect"));
 		effect.transform.position = transform.position;
@@ -38,7 +44,14 @@ public class PokemonObj : MonoBehaviour {
 
 	public bool UseMove(Vector3 direction, Move move){
 		if (move.GetPPCost()>pokemon.pp)	return false;
-
+		string attackChat = "";
+		if (pokemon.isPlayer) {
+			attackChat = "Your ";
+		}
+		else {
+			attackChat = "Enemy ";
+		}
+		attackChat += pokemon.name + " used " + move.moveType + "!";
 		switch(move.moveType){
 
 		case MoveNames.Growl:{
@@ -122,7 +135,7 @@ public class PokemonObj : MonoBehaviour {
 			pokemon.pp-=move.GetPPCost();
 			return true;}
 		}
-
+		gamegui.SetChatWindow (attackChat);
 		return false;
 	}
 }

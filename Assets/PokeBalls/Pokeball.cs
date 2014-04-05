@@ -6,6 +6,7 @@ public class Pokeball : MonoBehaviour {
 	public Pokemon pokemon = null;
 	public bool active = true;
 	bool fired = false;
+	static GameGUI gamegui = new GameGUI();
 
 	float lifetime = 1;
 
@@ -78,5 +79,25 @@ public class Pokeball : MonoBehaviour {
 			ball.rigidbody.AddForce( direct.normalized*500+ Vector3.up * direct.magnitude/50);
 			ball.GetComponent<Pokeball>().trainer = trainer;
 		}
+	}
+
+	public static void CapturePokemon() {
+		string printme="";
+		PokemonObj targetPokemon = PokemonPlayer.target.GetComponent<PokemonObj>();
+		if (targetPokemon != null) {
+			printme = "capture " + targetPokemon.pokemon.name + ". It has " + targetPokemon.pokemon.hp + "hp remaining!";
+			if (targetPokemon.pokemon.hp*100 < 15) {
+				printme = printme + "\n Okay!";
+				targetPokemon.Return();
+				Pokemon.party.Add(new Pokemon(targetPokemon.pokemon.number,true));
+			}
+			else {
+				printme = printme + "\n It's too strong!";
+			}
+		}
+		else {
+			//printme = "Nothing found to capture!";
+		}
+		gamegui.SetChatWindow(printme);
 	}
 }
