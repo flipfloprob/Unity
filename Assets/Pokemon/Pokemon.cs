@@ -14,6 +14,7 @@ public class Pokemon{
 	public float pp = 1;
 	public Texture2D icon = null;
 	public List<Move> moves = new List<Move>();
+	public bool isPlayer = false;
 
 	public int health = 10;
 	public int attack = 10;
@@ -21,8 +22,9 @@ public class Pokemon{
 	public int speed = 10;
 	public Item heldItem = null;
 
-	public Pokemon(int number){
+	public Pokemon(int number, bool isPlayer){
 		this.number = number;
+		this.isPlayer = isPlayer;
 		name = GetName(number);
 		icon = GetIcon(number);
 		level = 5;
@@ -33,9 +35,10 @@ public class Pokemon{
 		PopulateMoves();
 	}
 
-	public Pokemon(int number, int level){
+	public Pokemon(int number, bool isPlayer, int level){
 		Debug.Log("New "+GetName(number));
 		this.number = number;
+		this.isPlayer = isPlayer;
 		name = GetName(number);
 		icon = GetIcon(number);
 		this.level = level;
@@ -63,6 +66,9 @@ public class Pokemon{
 	}
 	public int TotalSpeed(){
 		return (Pokemon_BaseStats.Speed((Pokemon_Names)number))*level/50 + 5;
+	}
+	public string GetName() {
+		return this.name;
 	}
 
 	public void PopulateMoves(){

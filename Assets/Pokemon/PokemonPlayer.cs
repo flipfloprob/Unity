@@ -6,6 +6,7 @@ public class PokemonPlayer : MonoBehaviour {
 	static bool jumpCool = true;
 	bool letsGo = false;
 	PokemonObj pokemonObj;
+	GameGUI gamegui = new GameGUI();
 
 	void Start(){
 		pokemonObj = GetComponent<PokemonObj>();

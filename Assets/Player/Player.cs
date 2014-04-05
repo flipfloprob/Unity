@@ -13,19 +13,22 @@ public class Player : MonoBehaviour {
 
 	public static bool pokemonActive = false;
 	public static GameObject pokemonObj = null;
+	public static GameGUI gamegui = new GameGUI();
 
 	void Start(){
-		GUImgr.Start();
-		This = this;
-		Pokemon.party.Add(new Pokemon(1));
-		Pokemon.party.Add(new Pokemon(4));
-		Pokemon.party.Add(new Pokemon(7));
-		Pokedex.states[1] = Pokedex.State.Captured;
-		Pokedex.states[4] = Pokedex.State.Captured;
-		Pokedex.states[7] = Pokedex.State.Captured;
+		if (Pokemon.party.Count == 0) {
+			GUImgr.Start ();
+			This = this;
+			Pokemon.party.Add (new Pokemon (1, true));
+			Pokemon.party.Add (new Pokemon (4, true));
+			Pokemon.party.Add (new Pokemon (7, true));
+			Pokedex.states [1] = Pokedex.State.Captured;
+			Pokedex.states [4] = Pokedex.State.Captured;
+			Pokedex.states [7] = Pokedex.State.Captured;
 
-		Item.inventory.Add(new Item(ItemTypes.Pokeball, 5));
-		Item.inventory.Add(new Item(ItemTypes.Potion, 2));
+			Item.inventory.Add (new Item (ItemTypes.Pokeball, 5));
+			Item.inventory.Add (new Item (ItemTypes.Potion, 2));
+		}
 	}
 
 	void Update(){
@@ -130,6 +133,33 @@ public class Player : MonoBehaviour {
 			click = true;
 		}
 
+		//capture pokemon
+		if(Input.GetKeyDown("c")) {
+			GameGUI gamegui = GetComponent<GameGUI>();
+			CapturePokemon();
+			click = true;
+		}
+		
+		//chat window
+		if(Input.GetKeyDown ("i")){
+			if(GameGUI.chatActive)
+				GameGUI.chatActive=false;
+			else
+				GameGUI.chatActive=true;
+			
+			click = true;
+		}
+
+		if (Input.GetKeyDown ("h")) {
+			PokeCenter.HealPokemon ();
+		}
+	/*
+	 * don't try using this right now, because it doesn't exist!
+		if (Input.GetKeyDown ("k")) {
+			Populate okasf = new Populate();
+			okasf.Test();
+		}
+	*/
 		//anticlick
 		if (!Input.GetKey(KeyCode.Alpha1) &&  !Input.GetKey(KeyCode.Keypad1)
 		    && !Input.GetKey(KeyCode.Alpha2) &&  !Input.GetKey(KeyCode.Keypad2)
@@ -164,6 +194,22 @@ public class Player : MonoBehaviour {
 		ball.GetComponent<Pokeball>().trainer = This.gameObject;
 		pokemonActive = true;
 		click = true;
+		gamegui.SetChatWindow(ball.GetComponent<Pokeball>().pokemon.GetName() + "! I choose you!");
+	}
+
+	public static void CapturePokemon(){
+		GameGUI gamegui = new GameGUI();
+		Debug.LogError("Capture Pokemon");
+		Vector3 pokemonPositon = pokemonObj.transform.position;
+		GameObject ball = (GameObject)Instantiate(Resources.Load("Pokeball"));
+		//ball.transform.position = GameObject.Find("_PokeballHolder").transform.position;
+		GameObject.Find ("_PokeballHolder").transform.LookAt(pokemonPositon);
+		ball.transform.position = GameObject.Find ("_PokeballHolder").transform.position;
+		//ball.rigidbody.AddForce
+		//	( Camera.main.transform.forward*500+ Camera.main.transform.up*300 );
+		ball.rigidbody.AddForce(pokemonPositon*500 + Camera.main.transform.up*300);
+		Pokeball.CapturePokemon();
+		Destroy (ball, 1);
 	}
 
 	void LateUpdate(){

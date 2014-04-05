@@ -4,6 +4,9 @@ using System.Collections;
 public class GameGUI : MonoBehaviour {
 
 	public static bool menuActive = false;
+	public static bool chatActive=false;
+	public static string addToChat;
+	public static ArrayList chatHistory = new ArrayList();
 	int pokedexEntery = 1;
 	enum MenuWindows{None, Multiplayer, Pokedex, Pokemon, Inventory, Talents, Options, Quit};
 	MenuWindows currentWindow = MenuWindows.None;
@@ -22,6 +25,11 @@ public class GameGUI : MonoBehaviour {
 		}
 
 		Dialog.doneDialog = false;
+
+		if(chatActive){
+			OpenChatWindow();
+		}
+
 		if (Player.pokemonActive && Player.pokemonObj!=null){
 			Player.pokemonObj.GetComponent<PokemonPlayer>().BattleGUI();
 			return;
@@ -97,6 +105,45 @@ public class GameGUI : MonoBehaviour {
 			GUI.Label(new Rect(20, ypos, 200,25), "Not connected");
 			GUI.Label(new Rect(20, ypos, 200,25), "Not connected");
 		}
+	}
+
+	public void OpenChatWindowa() {
+		int bottomLeftX = 0;
+		int errorHeight = 300;
+		int bottomLeftY = Screen.height - errorHeight;
+		int screenWidth = Screen.width;
+		GUI.DrawTexture(new Rect(bottomLeftX,bottomLeftY,screenWidth,errorHeight), GUImgr.gradRight);
+		//GUI.Label(new Rect(bottomLeftX,(bottomLeftY-(errorHeight/2)+GUI.skin.label.fontSize),screenWidth,errorHeight), addToChat);
+		for (int x=0;x<chatHistory.Count;x++) {
+			int linePosition = GUI.skin.label.fontSize;
+			if(x>0){linePosition=GUI.skin.label.fontSize*x;}
+			string tmpChat = chatHistory[x].ToString();
+			GUI.Label(new Rect(bottomLeftX,(bottomLeftY-(errorHeight/2)+linePosition),screenWidth,errorHeight), tmpChat);
+		}
+	}
+	
+	private Vector2 scrollPosition;
+	public void OpenChatWindow() {
+		int bottomLeftX = 0;
+		int errorHeight = 300;
+		int bottomLeftY = Screen.height - errorHeight;
+		int screenWidth = Screen.width;
+		GUI.DrawTexture(new Rect(bottomLeftX,bottomLeftY,screenWidth,errorHeight), GUImgr.gradRight);
+		GUILayout.BeginArea(new Rect(bottomLeftX+10,bottomLeftY+10,screenWidth-20,errorHeight-20));
+		scrollPosition = GUILayout.BeginScrollView (scrollPosition, GUILayout.Width (Screen.width-100), GUILayout.Height (Screen.height-100));
+		GUI.skin.box.wordWrap = true;
+		GUILayout.Box(addToChat);
+		GUILayout.EndScrollView ();
+		GUILayout.EndArea();
+	}
+	public void SetChatWindow(string toChat) {
+		addToChat = addToChat + "\n" + toChat;
+		if (chatHistory.Count > 10) {
+			chatHistory.Remove (0);
+		}
+		chatHistory.Add (toChat);
+		//scrollPosition = new Vector2(0, Mathf.Infinity);
+		scrollPosition = new Vector2(scrollPosition.x, Mathf.Infinity);
 	}
 	
 	void PokedexWindow(){
