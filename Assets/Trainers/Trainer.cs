@@ -32,7 +32,7 @@ public class Trainer : MonoBehaviour {
 					//populate pokemon
 					party = new Pokemon[pokemon.Length];
 					for(int i=0; i<pokemon.Length; i++){
-						party[i] = new Pokemon((int)pokemon[i].pokemon, pokemon[i].level);
+						party[i] = new Pokemon((int)(pokemon[i].pokemon), false, pokemon[i].level);
 						party[i].name = pokemon[i].name;
 					}
 					currentState = States.InBattle;
