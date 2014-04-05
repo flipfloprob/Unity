@@ -46,6 +46,8 @@ public class Pokemon{
 	}
 
 	public void Damage(Pokemon otherPoke, Move move){
+		//this must take into account weakness and attributes (defense, attack, sp_Defense, sp_Attack)
+		//this must be object oriented
 		float damage = 1;
 		hp -= damage/(float)TotalHP();	//replace with some elabourate forumla
 		GiveXP(10);
@@ -111,6 +113,7 @@ public class Pokemon{
 	}
 
 	public static string GetName(int number){
+		//instead of doing this it would be much easier to pass in a pokemon and take it's name from its inherent method
 		switch(number){
 		case 1: return "Bulbasaur";
 		case 4: return "Charmander";
