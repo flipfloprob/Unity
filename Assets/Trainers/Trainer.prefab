@@ -842,10 +842,10 @@ GameObject:
   - 4: {fileID: 400110}
   - 95: {fileID: 9500000}
   - 136: {fileID: 13600000}
-  - 114: {fileID: 11400000}
   - 54: {fileID: 5400000}
+  - 114: {fileID: 11400000}
   m_Layer: 8
-  m_Name: Player
+  m_Name: Trainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1525,8 +1525,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100110}
-  m_LocalRotation: {x: 0, y: .707106829, z: 0, w: .707106829}
-  m_LocalPosition: {x: -472.596252, y: 50.0593338, z: 3.68613625}
+  m_LocalRotation: {x: 0, y: -.880983651, z: 0, w: .473146707}
+  m_LocalPosition: {x: 48.2344971, y: 51.1540756, z: 25.9798584}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 400108}
@@ -1586,9 +1586,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 100110}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d7f3412833fa504ea205618a3e5b816, type: 3}
+  m_Script: {fileID: 11500000, guid: 490727b76dac5b648b67602bea7b6c4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pokemon:
+  - pokemon: 19
+    name: Ratty
+    level: 5
+  - pokemon: 1
+    name: Bulb
+    level: 5
+  - pokemon: 16
+    name: Pidey
+    level: 5
 --- !u!136 &13600000
 CapsuleCollider:
   m_ObjectHideFlags: 1

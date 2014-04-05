@@ -2,6 +2,7 @@
 using System.Collections;
 
 public class GameGUI : MonoBehaviour {
+
 	public static bool menuActive = false;
 	int pokedexEntery = 1;
 	enum MenuWindows{None, Multiplayer, Pokedex, Pokemon, Inventory, Talents, Options, Quit};
@@ -14,7 +15,13 @@ public class GameGUI : MonoBehaviour {
 
 		float mx = Input.mousePosition.x;
 		float my = Screen.height-Input.mousePosition.y;
-		
+
+		if (Dialog.inDialog){
+			Dialog.GUIWindow();
+			return;
+		}
+
+		Dialog.doneDialog = false;
 		if (Player.pokemonActive && Player.pokemonObj!=null){
 			Player.pokemonObj.GetComponent<PokemonPlayer>().BattleGUI();
 			return;

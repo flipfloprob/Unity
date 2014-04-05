@@ -29,6 +29,14 @@ public class Player : MonoBehaviour {
 	}
 
 	void Update(){
+		if (Dialog.inDialog){
+			Screen.lockCursor = false;
+			Screen.showCursor = true;
+			GetComponent<Animator>().SetBool("run",false);
+			return;
+		}
+
+
 		if (GameGUI.menuActive && !pokemonActive){
 			Screen.lockCursor = false;
 			Screen.showCursor = true;
@@ -161,11 +169,19 @@ public class Player : MonoBehaviour {
 	void LateUpdate(){
 		Quaternion camRot = Camera.main.transform.rotation;
 
-		if (pokemonObj!=null && pokemonActive){
-			Camera.main.transform.rotation = pokemonObj.transform.rotation * Quaternion.Euler(ax,0,0);
+		if (Dialog.NPCobj=null){
+			//focus on person speaking to you
+			Vector3 camFocus = Dialog.NPCobj.transform.position+Vector3.up;
+			Camera.main.transform.rotation = Quaternion.LookRotation(Camera.main.transform.position-camFocus);
 		}else{
-			cameraFocus = transform.position+Vector3.up*2;
-			Camera.main.transform.rotation = Quaternion.Euler(ax,ay,0);
+			if (pokemonObj!=null && pokemonActive){
+				//focus on current pokemon
+				Camera.main.transform.rotation = pokemonObj.transform.rotation * Quaternion.Euler(ax,0,0);
+			}else{
+				//focus on player
+				cameraFocus = transform.position+Vector3.up*2;
+				Camera.main.transform.rotation = Quaternion.Euler(ax,ay,0);
+			}
 		}
 		Camera.main.transform.position = cameraFocus;
 		Camera.main.transform.Translate(0,0,-cameraZoom);
