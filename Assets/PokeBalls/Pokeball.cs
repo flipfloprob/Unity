@@ -85,15 +85,34 @@ public class Pokeball : MonoBehaviour {
 		string printme="";
 		PokemonObj targetPokemon = PokemonPlayer.target.GetComponent<PokemonObj>();
 		if (targetPokemon != null) {
-			printme = "capture " + targetPokemon.pokemon.name + ". It has " + targetPokemon.pokemon.hp + "hp remaining!";
-			if (targetPokemon.pokemon.hp*100 < 15) {
-				printme = printme + "\n Okay!";
+			float statusAilment = 0;	//statusAilment = 12 if poisoned/burned/paralyzed, 25 if frozen or asleep, 0 otherwise.
+			float ballMod = 150;		//ballMod = 255 if using a Poké Ball, 200 if using a Great Ball, and 150 otherwise.
+			float captureOne = statusAilment / (ballMod+1);
+			float captureRate = 22;	//need to put this into DB: http://bulbapedia.bulbagarden.net/wiki/List_of_Pok%C3%A9mon_by_catch_rate
+			float ballFactor = 12;
+			float f = (((targetPokemon.pokemon.TotalHP())*255) / ballFactor) / (targetPokemon.pokemon.hp / 4);
+			/*
+			 * 	f = (HPmax * 255 / Ball Factor) / (HPcurrent / 4), where all divisions 
+			 * are rounded down to the nearest integer (the denominator is set to 1 if 
+			 * it is 0 as a result). The Ball Factor is 8 if a Great Ball is used, and 
+			 * 12 otherwise. The resulting value is capped at a maximum of 255. 
+			 */	
+			float captureTwo = ((captureRate+1)/(ballMod+1)) * ((f+1)/256);
+
+			//printme = "capture " + targetPokemon.pokemon.name + ". It has " + targetPokemon.pokemon.hp + "hp remaining!";
+			//if (targetPokemon.pokemon.hp*100 < 15) {
+			float captureChance = captureOne+captureTwo;
+			if (captureChance >= Random.value) {
+				//printme = printme + "\n Okay!";
+				printme = "You've captured a " + targetPokemon.pokemon.GetName() + "!";
 				targetPokemon.Return();
 				Pokemon.party.Add(new Pokemon(targetPokemon.pokemon.number,true));
 			}
 			else {
-				printme = printme + "\n It's too strong!";
+				//printme = printme + "\n It's too strong!";
+				printme = "You tried to capture " + targetPokemon.pokemon.GetName() + ", but it broke free!";
 			}
+			//printme += "\n " + captureChance;
 		}
 		else {
 			//printme = "Nothing found to capture!";
