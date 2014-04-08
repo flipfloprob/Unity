@@ -19,6 +19,6 @@ public class Dialog{
 		GUI.skin.label.alignment = TextAnchor.UpperLeft;
 		GUI.DrawTexture(new Rect(0,Screen.height/2,Screen.width/2,Screen.height/2), GUImgr.gradRight);
 		GUI.Label(new Rect(20,Screen.height/2+20,Screen.width,40), Dialog.NPCname);
-		GUI.Label(new Rect(20,Screen.height/2+100,Screen.width,Screen.height/2-140), Dialog.text);
+		GUI.Label(new Rect(20,Screen.height/2+100,Screen.width/2-50,Screen.height/2-140), Dialog.text);
 	}
 }
