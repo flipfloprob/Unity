@@ -3,9 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Pokemon{
-	public static List<Pokemon> party = new List<Pokemon>();
-	public static Pokemon selected = null;
-
+	public bool thrown = false;
+	public PokemonObj obj = null;
 	public int number = 0;
 	public string name = "";
 	public int level = 5;

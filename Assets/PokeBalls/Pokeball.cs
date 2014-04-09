@@ -2,8 +2,9 @@
 using System.Collections;
 
 public class Pokeball : MonoBehaviour {
-	public GameObject trainer = null;
+	public Trainer trainer = null;
 	public Pokemon pokemon = null;
+
 	public bool active = true;
 	bool fired = false;
 	static GameGUI gamegui = new GameGUI();
@@ -31,35 +32,21 @@ public class Pokeball : MonoBehaviour {
 					pokeObj.transform.rotation = Quaternion.Euler(0,Random.value*360,0);
 					pokeObj.GetComponent<PokemonObj>().pokemon = pokemon;
 					pokeObj.name = pokemon.name;
+					pokemon.obj = pokeObj.GetComponent<PokemonObj>();
+					PokemonDomesticated pokeDom = pokeObj.AddComponent<PokemonDomesticated>();
+					pokeDom.trainer = trainer;
 
 					//assuming direct control
-					if (trainer==Player.This.gameObject){
-						pokeObj.AddComponent<PokemonPlayer>();
-						Player.pokemonObj = pokeObj;
+					if (trainer==Player.trainer){
 						Player.pokemonActive = true;
+						Debug.Log("Assuming direct control");
 					}
 				}
 			}
 		}
 	}
 
-	public static void ReleasePokemon(Pokemon pokemon, GameObject trainer){
-		if (trainer==Player.This.gameObject){
-			if (Player.pokemonActive)	return;
-			Player.pokemonActive = true;
-			Player.click = true;
-		}
-
-		GameObject ball = (GameObject)Instantiate(Resources.Load("Pokeball"));
-
-		ball.transform.position = GameObject.Find("_PokeballHolder").transform.position;
-		ball.rigidbody.AddForce
-			( Camera.main.transform.forward*500+ Camera.main.transform.up*300 );
-		ball.GetComponent<Pokeball>().pokemon = pokemon;
-		ball.GetComponent<Pokeball>().trainer = trainer;
-	}
-
-	public static void ThrowPokeBall(GameObject trainer){
+	public static void ThrowPokeBall(Trainer trainer){
 		//find the nearest pokemon to capture, withing the correct direction I guess
 		float dist = 1000000;
 		GameObject pokemonOb = null;
@@ -83,7 +70,7 @@ public class Pokeball : MonoBehaviour {
 
 	public static void CapturePokemon() {
 		string printme="";
-		PokemonObj targetPokemon = PokemonPlayer.target.GetComponent<PokemonObj>();
+		PokemonObj targetPokemon = Player.pokemon.obj.enemy;
 		if (targetPokemon != null) {
 			float statusAilment = 0;	//statusAilment = 12 if poisoned/burned/paralyzed, 25 if frozen or asleep, 0 otherwise.
 			float ballMod = 150;		//ballMod = 255 if using a Poké Ball, 200 if using a Great Ball, and 150 otherwise.
@@ -106,7 +93,7 @@ public class Pokeball : MonoBehaviour {
 				//printme = printme + "\n Okay!";
 				printme = "You've captured a " + targetPokemon.pokemon.GetName() + "!";
 				targetPokemon.Return();
-				Pokemon.party.Add(new Pokemon(targetPokemon.pokemon.number,true));
+				Player.trainer.pokemon.Add(new Pokemon(targetPokemon.pokemon.number,true));
 			}
 			else {
 				//printme = printme + "\n It's too strong!";

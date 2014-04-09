@@ -3,78 +3,51 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Trainer : MonoBehaviour {
-	[System.Serializable]
-	public class PartyPokemon{
-		public Pokemon_Names pokemon = Pokemon_Names.Bulbasaur;
-		public string name = "MyPokemon";
-		public int level = 5;
-	}
-	public PartyPokemon[] pokemon;
-	bool pokemonActive = false;
-	GameObject currentPokemonObj = null;
-	public Pokemon[] party;
-	Vector3 trainerPosition = Vector3.zero;
+	public List<Pokemon> pokemon = new List<Pokemon>();
+	public List<Item> inventory = new List<Item>();
 
-	enum States {Ready, InBattle, Defeated};
-	States currentState = States.Ready;
+	Vector3 velocity = Vector3.zero;
+
+	void Start(){
+		//kanto starters, why not
+		pokemon.Add (new Pokemon (1, true));
+		pokemon.Add (new Pokemon (4, true));
+		pokemon.Add (new Pokemon (7, true));
+		Pokedex.states [1] = Pokedex.State.Captured;
+		Pokedex.states [4] = Pokedex.State.Captured;
+		Pokedex.states [7] = Pokedex.State.Captured;
+
+		inventory.Add (new Item (ItemTypes.Pokeball, 5));
+		inventory.Add (new Item (ItemTypes.Potion, 2));
+	}
 
 	void Update(){
-		switch(currentState){
-
-		case States.Ready:{
-			Vector3 direct = Player.This.transform.position - transform.position;
-			if (direct.sqrMagnitude<10*10 && Vector3.Dot(direct, transform.forward)>0){
-
-				Dialog.inDialog = true;
-				Dialog.NPCobj = gameObject;
-				Dialog.NPCname = "Young Trainer";
-				Dialog.text = "You're a pokemon trainer right? That means we have to battle!";
-				if (Dialog.doneDialog){
-					Dialog.inDialog = false;
-					//populate pokemon
-					party = new Pokemon[pokemon.Length];
-					for(int i=0; i<pokemon.Length; i++){
-						party[i] = new Pokemon((int)(pokemon[i].pokemon), false, pokemon[i].level);
-						party[i].name = pokemon[i].name;
-					}
-					currentState = States.InBattle;
-					trainerPosition = transform.position - direct.normalized*10;
-				}
-			}
-			break;}
-
-		case States.InBattle:	InBattle();	break;
-
+		//inventoryMGR
+		for(int i=0; i<inventory.Count; i++){
+			if (inventory[i].number<=0)	inventory.Remove(inventory[i]);
 		}
 	}
 
-	void InBattle(){
-		//move trainer to position
-		Vector3 direct = trainerPosition-transform.position;
-		direct.y = 0;
-		if (direct.sqrMagnitude>1){
-			transform.rotation = Quaternion.LookRotation(direct);
-			GetComponent<Animator>().SetBool("run", true);
-		}else{
-			if (currentPokemonObj!=null){
-				direct = currentPokemonObj.transform.position-transform.position;
-			}else{
-				direct = Player.This.transform.position-transform.position;
-			}
-			direct.y = 0;
-			transform.rotation = Quaternion.LookRotation(direct);
-			GetComponent<Animator>().SetBool("run", false);
-			if (pokemonActive==false)	ThrowPokemon(party[0]);
-		}
-	}
-
-	void ThrowPokemon(Pokemon poke){
-		pokemonActive = true;
+	public void ThrowPokemon(Pokemon poke){
+		if (poke.thrown)	return;
+		poke.thrown = true;
 		GameObject ball = (GameObject)Instantiate(Resources.Load("Pokeball"));
 		ball.transform.position = transform.position;
-		ball.rigidbody.AddForce( (transform.forward*2+ transform.up)*500 );
+		ball.rigidbody.AddForce( (transform.forward*2+ transform.up)*400 );
 		ball.GetComponent<Pokeball>().pokemon = poke;
-		ball.GetComponent<Pokeball>().trainer = gameObject;
+		ball.GetComponent<Pokeball>().trainer = this;
 		//gamegui.SetChatWindow(ball.GetComponent<Pokeball>().pokemon.GetName() + "! I choose you!");
+	}
+
+	public void SetVelocity(Vector3 vel){
+		velocity = vel;
+		Animator ani = GetComponent<Animator>();
+
+		if (vel.magnitude>0.1f){
+			ani.SetBool("run",true);
+			transform.rotation = Quaternion.LookRotation(vel);
+		}else{
+			ani.SetBool("run",false);
+		}
 	}
 }

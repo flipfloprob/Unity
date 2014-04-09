@@ -3,8 +3,10 @@ using System.Collections;
 
 public class PokemonObj : MonoBehaviour {
 	public float speed = 5;
-	public Vector3 velocity = Vector3.zero;
 	public Pokemon pokemon = null;
+	public PokemonObj enemy = null;
+
+	Vector3 velocity = Vector3.zero;
 	bool returning = false;
 	GameGUI gamegui = new GameGUI();
 
@@ -27,9 +29,13 @@ public class PokemonObj : MonoBehaviour {
 		}
 	}
 
+	public void SetVelocity(Vector3 vel){
+		velocity = vel;
+	}
+
 	public void Return(){
 		if (returning)	return;
-		if (Player.pokemonObj == gameObject) {
+		if (Player.pokemon == pokemon) {
 			Player.pokemonActive = false;
 			//gamegui.SetChatWindow(gameObject.GetComponent<Pokeball>().pokemon.GetName() + "! Return!");
 			//gamegui.SetChatWindow(Player.pokemonObj.GetComponent<Pokeball>().pokemon.GetName() + "! Return!");
@@ -40,6 +46,7 @@ public class PokemonObj : MonoBehaviour {
 		effect.transform.position = transform.position;
 		effect.transform.parent = transform;
 		Destroy(gameObject,1);
+		pokemon.thrown = false;
 	}
 
 	public bool UseMove(Vector3 direction, Move move){
@@ -98,9 +105,8 @@ public class PokemonObj : MonoBehaviour {
 					newEffect.transform.position = hit.point;
 					if (enemyObj){
 						if (enemyObj.pokemon!=null)	enemyObj.pokemon.Damage(pokemon,move);
-						if (GetComponent<PokemonPlayer>())	PokemonPlayer.target = enemyObj.gameObject;
-						PokemonWild wildP = enemyObj.GetComponent<PokemonWild>();
-						if (wildP)	wildP.enemy = gameObject;
+						enemy = enemyObj;
+						enemyObj.enemy = this;
 					}
 				}
 			}
@@ -120,9 +126,8 @@ public class PokemonObj : MonoBehaviour {
 					newEffect.transform.position = hit.point;
 					if (enemyObj){
 						if (enemyObj.pokemon!=null)	enemyObj.pokemon.Damage(pokemon,move);
-						if (GetComponent<PokemonPlayer>())	PokemonPlayer.target = enemyObj.gameObject;
-						PokemonWild wildP = enemyObj.GetComponent<PokemonWild>();
-						if (wildP)	wildP.enemy = gameObject;
+						enemy = enemyObj;
+						enemyObj.enemy = this;
 					}
 					move.cooldown = 0;
 					pokemon.pp-=move.GetPPCost();

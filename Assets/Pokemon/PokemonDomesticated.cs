@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PokemonPlayer : MonoBehaviour {
-	public static GameObject target = null;
-	static bool jumpCool = true;
+public class PokemonDomesticated : MonoBehaviour {
+	public enum Orders {Heel, Idle, Charge}
+	public Orders currentOrder = Orders.Heel;
+	public Trainer trainer = null;
+	
 	bool letsGo = false;
 	PokemonObj pokemonObj;
 	GameGUI gamegui = new GameGUI();
@@ -14,38 +16,20 @@ public class PokemonPlayer : MonoBehaviour {
 	}
 
 	void Update(){
-		if (Player.pokemonActive){
-			pokemonObj.velocity += transform.forward * Input.GetAxis("Vertical");
-			pokemonObj.velocity += transform.right * Input.GetAxis("Horizontal");
-			pokemonObj.velocity*=pokemonObj.speed;
-			transform.Rotate(transform.up, Input.GetAxis("Mouse X"));
-			
-			if(Input.GetButton("Jump") && jumpCool && Physics.Raycast(transform.position+Vector3.up*0.1f, Vector3.down, 0.2f)){
-				rigidbody.AddForce(Vector3.up*3000);
-				jumpCool = false;
-			}
-			if(!Input.GetButton("Jump"))	jumpCool = true;
+		if (Player.pokemon.obj==pokemonObj && Player.pokemonActive)	return;
 
-			pokemonObj.pokemon.pp -= Time.deltaTime/100;
-			if (pokemonObj.pokemon.pp<=0){
-				Player.pokemonActive = false;
-				pokemonObj.Return();
-			}
-
-		}else{
-			Vector3 direct = Player.This.transform.position -transform.position;
+		switch(currentOrder){
+		case Orders.Heel:{
+			Vector3 direct = trainer.transform.position -transform.position;
 			direct.y = 0;
 			if (letsGo){
 				transform.rotation = Quaternion.LookRotation(direct);
-				pokemonObj.velocity = direct.normalized * pokemonObj.speed;
+				pokemonObj.SetVelocity(direct.normalized * pokemonObj.speed);
 			}
 			if (direct.sqrMagnitude<10)	letsGo = false;
 			if (direct.sqrMagnitude>20)	letsGo = true;
+			break;}
 		}
-	}
-
-	void LateUpdate(){
-		Player.cameraFocus = transform.position + Vector3.up;
 	}
 
 	public void BattleGUI(){
@@ -67,24 +51,16 @@ public class PokemonPlayer : MonoBehaviour {
 		GUImgr.DrawBar(new Rect(35,ypos+5,200,10), pokemonObj.pokemon.xp, GUImgr.xp);
 
 		//current target
-		if (target!=null){
-			PokemonObj targetPokeObj = target.GetComponent<PokemonObj>();
-			if (targetPokeObj!=null)	if (targetPokeObj.pokemon!=null){
+		if (pokemonObj.enemy!=null){
+			if (pokemonObj.enemy.pokemon!=null){
 				GUI.DrawTexture(new Rect(0,0,200,60), GUImgr.gradRight);
 				ypos = 5;
-				GUI.Label(new Rect(10,ypos,200,20), targetPokeObj.name+" lvl"+targetPokeObj.pokemon.level.ToString());
+				GUI.Label(new Rect(10,ypos,200,20), pokemonObj.enemy.name+" lvl"+pokemonObj.enemy.pokemon.level.ToString());
 				ypos+=20;
 				GUI.Label(new Rect(10,ypos,200,20), "HP");
-				GUImgr.DrawBar(new Rect(35,ypos+5,200,10), targetPokeObj.pokemon.hp, GUImgr.hp);;
-
-
-				foreach(Move move in targetPokeObj.pokemon.moves){
-					GUILayout.Label(move.moveType.ToString());
-				}
+				GUImgr.DrawBar(new Rect(35,ypos+5,200,10), pokemonObj.enemy.pokemon.hp, GUImgr.hp);;
 			}
 		}
-
-		//battleLog
 
 		//moves
 		float height = pokemonObj.pokemon.moves.Count*40+10;

@@ -2,7 +2,6 @@
 using System.Collections;
 
 public class GameGUI : MonoBehaviour {
-
 	public static bool menuActive = false;
 	public static bool chatActive=false;
 	public static string addToChat;
@@ -10,6 +9,10 @@ public class GameGUI : MonoBehaviour {
 	int pokedexEntery = 1;
 	enum MenuWindows{None, Multiplayer, Pokedex, Pokemon, Inventory, Talents, Options, Quit};
 	MenuWindows currentWindow = MenuWindows.None;
+
+	void Start(){
+		GUImgr.Start();
+	}
 
 	void OnGUI(){
 		GUI.skin.label.fontSize = 15;
@@ -30,8 +33,8 @@ public class GameGUI : MonoBehaviour {
 			OpenChatWindow();
 		}
 
-		if (Player.pokemonActive && Player.pokemonObj!=null){
-			Player.pokemonObj.GetComponent<PokemonPlayer>().BattleGUI();
+		if (Player.pokemonActive && Player.pokemon.obj!=null){
+			Player.pokemon.obj.GetComponent<PokemonDomesticated>().BattleGUI();
 			return;
 		}
 		
@@ -80,17 +83,19 @@ public class GameGUI : MonoBehaviour {
 			}
 			return;
 		}
-		
-		{float ypos = 0;
-			foreach(Pokemon poke in Pokemon.party){
-				if (poke==Pokemon.selected)
-					GUI.DrawTexture(new Rect(0,ypos+16,100,32), GUImgr.gradRight);
-				GUI.DrawTexture(new Rect(0,ypos,64,64), poke.icon);
-				GUI.Label(new Rect(64,ypos,200,25), poke.name+" lvl"+poke.level.ToString());
-				GUImgr.DrawBar(new Rect(64,ypos+25,100,5), poke.hp, GUImgr.hp);
-				GUImgr.DrawBar(new Rect(64,ypos+35,100,5), poke.xp, GUImgr.xp);
-				ypos += 70;
-			}}
+
+		{
+		float ypos = 0;
+		foreach(Pokemon poke in Player.trainer.pokemon){
+			if (poke==Player.pokemon)
+				GUI.DrawTexture(new Rect(0,ypos+16,100,32), GUImgr.gradRight);
+			GUI.DrawTexture(new Rect(0,ypos,64,64), poke.icon);
+			GUI.Label(new Rect(64,ypos,200,25), poke.name+" lvl"+poke.level.ToString());
+			GUImgr.DrawBar(new Rect(64,ypos+25,100,5), poke.hp, GUImgr.hp);
+			GUImgr.DrawBar(new Rect(64,ypos+35,100,5), poke.xp, GUImgr.xp);
+			ypos += 70;
+		}
+		}
 	}
 	
 	void MultiplayerWindow(){
@@ -102,7 +107,6 @@ public class GameGUI : MonoBehaviour {
 
 		ypos+=20;
 		if (Network.peerType==NetworkPeerType.Disconnected){
-			GUI.Label(new Rect(20, ypos, 200,25), "Not connected");
 			GUI.Label(new Rect(20, ypos, 200,25), "Not connected");
 		}
 	}
@@ -187,48 +191,50 @@ public class GameGUI : MonoBehaviour {
 		float mx = Input.mousePosition.x;
 		float my = Screen.height-Input.mousePosition.y;
 		{
-			float xpos = Screen.width/2 - Pokemon.party.Count*64/2;
-			foreach(Pokemon poke in Pokemon.party){
-				if (poke==Pokemon.selected)	GUI.DrawTexture(new Rect(xpos+16,0,32,50), GUImgr.gradDown);
+			float xpos = Screen.width/2 - Player.trainer.pokemon.Count*64/2;
+			foreach(Pokemon poke in Player.trainer.pokemon){
+				if (poke==Player.pokemon)	GUI.DrawTexture(new Rect(xpos+16,0,32,50), GUImgr.gradDown);
 				if (my<64 && mx>xpos && mx<xpos+64){
 					GUI.DrawTexture(new Rect(xpos+16,0,32,50), GUImgr.gradDown);
 					if (Input.GetMouseButton(0) && !Player.click){
 						Player.click = true;
-						Pokemon.selected = poke;
-						if (Player.pokemonObj!=null){
-							Player.pokemonObj.GetComponent<PokemonObj>().Return();
-							Player.ThrowPokemon();
+						if (Player.pokemon.obj!=null){
+							Player.pokemon.obj.Return();
+							Player.trainer.ThrowPokemon(poke);
 						}
+						Player.pokemon = poke;
 					}
 				}
 				GUI.DrawTexture(new Rect(xpos,0,64,64), poke.icon);
 				xpos+=64;
 			}}
 		
-		if (Pokemon.selected!=null){
+		if (Player.pokemon!=null){
+			Pokemon poke = Player.pokemon;
 			float ypos = 70;
 			GUI.DrawTexture(new Rect(0,ypos,300,200), GUImgr.gradRight);
 			ypos+=20;
-			GUI.Label(new Rect(20, ypos, 200,25), Pokemon.selected.name);
+			GUI.Label(new Rect(20, ypos, 200,25), poke.name);
 			GUI.Label(new Rect(150, ypos, 200,25), "HP");
-			GUImgr.DrawBar(new Rect(175,ypos+10,100,5), Pokemon.selected.hp, GUImgr.hp);
+			GUImgr.DrawBar(new Rect(175,ypos+10,100,5), poke.hp, GUImgr.hp);
 			ypos+=20;
-			string numberText = Pokemon.selected.number.ToString();
-			if (Pokemon.selected.number<100)	numberText = "0"+numberText;
-			if (Pokemon.selected.number<10)	numberText = "0"+numberText;
-			GUI.Label(new Rect(20, ypos, 200,25), "#"+numberText+" "+Pokemon.GetName(Pokemon.selected.number));
+			string numberText = poke.number.ToString();
+			if (poke.number<100)	numberText = "0"+numberText;
+			if (poke.number<10)	numberText = "0"+numberText;
+			GUI.Label(new Rect(20, ypos, 200,25), "#"+numberText+" "+Pokemon.GetName(poke.number));
 			GUI.Label(new Rect(150, ypos, 200,25), "XP");
-			GUImgr.DrawBar(new Rect(175,ypos+10,100,5), Pokemon.selected.xp, GUImgr.xp);
+			GUImgr.DrawBar(new Rect(175,ypos+10,100,5), poke.xp, GUImgr.xp);
 			ypos+=50;
 			
-			GUI.Label(new Rect(20, ypos, 200,25), "Health "+Pokemon.selected.health.ToString());
-			GUI.Label(new Rect(150, ypos, 200,25), "Speed "+Pokemon.selected.speed.ToString());
+			GUI.Label(new Rect(20, ypos, 200,25), "Health "+poke.health.ToString());
+			GUI.Label(new Rect(150, ypos, 200,25), "Speed "+poke.speed.ToString());
 			ypos+=20;
-			GUI.Label(new Rect(20, ypos, 200,25), "Attack "+Pokemon.selected.attack.ToString());
-			GUI.Label(new Rect(150, ypos, 200,25), "Defence "+Pokemon.selected.defence.ToString());
+			GUI.Label(new Rect(20, ypos, 200,25), "Attack "+poke.attack.ToString());
+			GUI.Label(new Rect(150, ypos, 200,25), "Defence "+poke.defence.ToString());
+
 			ypos+=20;
-			if (Pokemon.selected.heldItem!=null){
-				GUI.Label(new Rect(20, ypos, 200,25), Pokemon.selected.heldItem.type.ToString());
+			if (poke.heldItem!=null){
+				GUI.Label(new Rect(20, ypos, 200,25), poke.heldItem.type.ToString());
 			}
 		}
 	}
@@ -238,13 +244,13 @@ public class GameGUI : MonoBehaviour {
 		float mx = Input.mousePosition.x;
 		float my = Screen.height-Input.mousePosition.y;
 		float ypos = 0;
-		foreach(Item item in Item.inventory){
-			if (item==Item.selected)	GUI.DrawTexture(new Rect(0,ypos+8,150,16), GUImgr.gradRight);
+		foreach(Item item in Player.trainer.inventory){
+			if (item==Player.item)	GUI.DrawTexture(new Rect(0,ypos+8,150,16), GUImgr.gradRight);
 			if (mx<100 && my>ypos && my<ypos+30){
 				GUI.DrawTexture(new Rect(0,ypos+8,150,16), GUImgr.gradRight);
 				if (Input.GetMouseButton(0) && !Player.click){
 					Player.click = true;
-					Item.selected = item;
+					Player.item = item;
 				}
 			}
 			GUI.DrawTexture(new Rect(0,ypos,32,32), item.icon);
@@ -255,7 +261,7 @@ public class GameGUI : MonoBehaviour {
 			ypos+=30;
 		}
 		
-		if (Item.selected!=null){
+		if (Player.item!=null){
 			ypos = 0;
 			float width = Screen.width-400;
 			GUI.DrawTexture(new Rect(180,-50,width+40,200), GUImgr.gradDown);
@@ -265,7 +271,7 @@ public class GameGUI : MonoBehaviour {
 					GUI.DrawTexture(new Rect(200,0,width/3,25), GUImgr.gradDown);
 					if (Input.GetMouseButton(0)	&& !Player.click){
 						Player.click = true;
-						Item.selected.Use();
+						Player.item.Use();
 					}
 				}
 				if (mx>200+width/3 && mx<200+2*width/3){
@@ -275,10 +281,10 @@ public class GameGUI : MonoBehaviour {
 					GUI.DrawTexture(new Rect(200+2*width/3,0,width/3,25), GUImgr.gradDown);
 					if (Input.GetMouseButton(0)	&& !Player.click){
 						Player.click = true;
-						Item.selected.number--;
-						if (Item.selected.number<=0){
-							Item.inventory.Remove(Item.selected);
-							Item.selected = null;
+						Player.item.number--;
+						if (Player.item.number<=0){
+							Player.trainer.inventory.Remove(Player.item);
+							Player.item = null;
 							return;
 						}
 					}
@@ -291,7 +297,7 @@ public class GameGUI : MonoBehaviour {
 			
 			ypos += 25;
 			GUI.skin.label.alignment = TextAnchor.MiddleLeft;
-			GUI.Label(new Rect(200,ypos,width,50), Item.ItemDescription(Item.selected.type));
+			GUI.Label(new Rect(200,ypos,width,50), Item.ItemDescription(Player.item.type));
 		}
 	}
 	

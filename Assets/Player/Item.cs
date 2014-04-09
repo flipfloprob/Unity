@@ -3,9 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Item{
-	public static List<Item> inventory = new List<Item>();
-	public static Item selected = null;
-
 	public ItemTypes type = ItemTypes.Pokeball;
 	public int number = 0;
 	public Texture2D icon;
@@ -24,7 +21,7 @@ public class Item{
 	public void Use(){
 		switch(type){
 		case ItemTypes.Pokeball:
-			Pokeball.ThrowPokeBall(Player.This.gameObject);
+			//Pokeball.ThrowPokeBall(Player.This.gameObject);
 			number--;
 			return;
 		}

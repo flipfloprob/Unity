@@ -12,10 +12,10 @@ public class Move{
 	
 	public float GetPPCost(){
 		switch(moveType){
-		case MoveNames.Tackle:			return 0.05f;
-		case MoveNames.Scratch:			return 0.05f;
-		case MoveNames.Growl:			return 0.05f;
-		case MoveNames.TailWhip:		return 0.05f;
+		case MoveNames.Tackle:			return 0.02f;
+		case MoveNames.Scratch:			return 0.02f;
+		case MoveNames.Growl:			return 0.02f;
+		case MoveNames.TailWhip:		return 0.02f;
 		}
 		return 0;
 	}

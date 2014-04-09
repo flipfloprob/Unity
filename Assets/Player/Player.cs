@@ -3,43 +3,37 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Player : MonoBehaviour {
-	public static Player This;
+	public static bool click = false;
+	static bool jumpCool = true;
+
+	public static Trainer trainer = null;
+	public static Pokemon pokemon = null;
+	public static Item item = null;
+	public static bool pokemonActive = false;
+
 	public static float ax = 0;
 	public static float ay = 0;
 	public static Vector3 cameraFocus = Vector3.zero;
+
 	Vector3 camPos = Vector3.zero;
 	float cameraZoom = 6;
-	public static bool click = false;
 
-	public static bool pokemonActive = false;
-	public static GameObject pokemonObj = null;
 	public static GameGUI gamegui = new GameGUI();
 
 	void Start(){
-		if (Pokemon.party.Count == 0) {
-			GUImgr.Start ();
-			This = this;
-			Pokemon.party.Add (new Pokemon (1, true));
-			Pokemon.party.Add (new Pokemon (4, true));
-			Pokemon.party.Add (new Pokemon (7, true));
-			Pokedex.states [1] = Pokedex.State.Captured;
-			Pokedex.states [4] = Pokedex.State.Captured;
-			Pokedex.states [7] = Pokedex.State.Captured;
-
-			Item.inventory.Add (new Item (ItemTypes.Pokeball, 5));
-			Item.inventory.Add (new Item (ItemTypes.Potion, 2));
-		}
+		trainer = GameObject.Find("Player").GetComponent<Trainer>();
 	}
 
 	void Update(){
+		//do nothing if in dialog
 		if (Dialog.inDialog){
 			Screen.lockCursor = false;
 			Screen.showCursor = true;
-			GetComponent<Animator>().SetBool("run",false);
+			trainer.SetVelocity(Vector3.zero);
 			return;
 		}
 
-
+		//menu
 		if (GameGUI.menuActive && !pokemonActive){
 			Screen.lockCursor = false;
 			Screen.showCursor = true;
@@ -56,66 +50,84 @@ public class Player : MonoBehaviour {
 			ay = ay%360;
 		}
 		
-		//player control / animation
-		Animator ani = GetComponent<Animator>();
-		if (!pokemonActive || pokemonObj==null){
-			Vector3 vel = Quaternion.Euler(0,ay,0) * (Vector3.forward*Input.GetAxis("Vertical") + Vector3.right*Input.GetAxis("Horizontal"));
-			if (vel.magnitude>0.1f){
-				ani.SetBool("run",true);
-				transform.rotation = Quaternion.LookRotation(vel);
-			}else
-				ani.SetBool("run",false);
+		//player control
+		if (pokemonActive && pokemon.obj!=null){
+			//move pokemon
+			trainer.SetVelocity(Vector3.zero);
+
+			Vector3 velocity = Vector3.zero;
+			velocity += pokemon.obj.transform.forward * Input.GetAxis("Vertical");
+			velocity += pokemon.obj.transform.right * Input.GetAxis("Horizontal");
+			velocity *= pokemon.obj.speed;
+
+			pokemon.obj.SetVelocity(velocity);
+			pokemon.obj.transform.Rotate(pokemon.obj.transform.up, Input.GetAxis("Mouse X"));
+			
+			if(Input.GetButton("Jump") && jumpCool && Physics.Raycast(pokemon.obj.transform.position+Vector3.up*0.1f, Vector3.down, 0.2f)){
+				pokemon.obj.rigidbody.AddForce(Vector3.up*3000);
+				jumpCool = false;
+			}
+			if(!Input.GetButton("Jump"))	jumpCool = true;
+			
+			pokemon.pp -= Time.deltaTime/500;
+			if (pokemon.pp<=0){
+				pokemonActive = false;
+				pokemon.obj.Return();
+			}
+
 		}else{
-			ani.SetBool("run",false);
+			//move trainer
+			Vector3 vel = Quaternion.Euler(0,ay,0) * (Vector3.forward*Input.GetAxis("Vertical") + Vector3.right*Input.GetAxis("Horizontal"));
+			trainer.SetVelocity(vel);
 		}
 
 		//swap pokemon
 		if (!click && !pokemonActive){
-			Pokemon oldPokemonSelection = Pokemon.selected;
-			if (Pokemon.party.Count>0 && (Input.GetKey(KeyCode.Alpha1) ||  Input.GetKey(KeyCode.Keypad1)))	Pokemon.selected = Pokemon.party[0];
-			if (Pokemon.party.Count>1 && (Input.GetKey(KeyCode.Alpha2) ||  Input.GetKey(KeyCode.Keypad2)))	Pokemon.selected = Pokemon.party[1];
-			if (Pokemon.party.Count>2 && (Input.GetKey(KeyCode.Alpha3) ||  Input.GetKey(KeyCode.Keypad3)))	Pokemon.selected = Pokemon.party[2];
-			if (Pokemon.party.Count>3 && (Input.GetKey(KeyCode.Alpha4) ||  Input.GetKey(KeyCode.Keypad4)))	Pokemon.selected = Pokemon.party[3];
-			if (Pokemon.party.Count>4 && (Input.GetKey(KeyCode.Alpha5) ||  Input.GetKey(KeyCode.Keypad5)))	Pokemon.selected = Pokemon.party[4];
-			if (Pokemon.party.Count>5 && (Input.GetKey(KeyCode.Alpha6) ||  Input.GetKey(KeyCode.Keypad6)))	Pokemon.selected = Pokemon.party[5];
-			if (Pokemon.party.Count>6 && (Input.GetKey(KeyCode.Alpha7) ||  Input.GetKey(KeyCode.Keypad7)))	Pokemon.selected = Pokemon.party[6];
-			if (Pokemon.party.Count>7 && (Input.GetKey(KeyCode.Alpha8) ||  Input.GetKey(KeyCode.Keypad8)))	Pokemon.selected = Pokemon.party[7];
-			if (Pokemon.party.Count>8 && (Input.GetKey(KeyCode.Alpha9) ||  Input.GetKey(KeyCode.Keypad9)))	Pokemon.selected = Pokemon.party[8];
-			if (Pokemon.party.Count>9 && (Input.GetKey(KeyCode.Alpha0) ||  Input.GetKey(KeyCode.Keypad0)))	Pokemon.selected = Pokemon.party[9];
+			Pokemon oldPokemonSelection = pokemon;
+			if (trainer.pokemon.Count>0 && (Input.GetKey(KeyCode.Alpha1) ||  Input.GetKey(KeyCode.Keypad1)))	pokemon = trainer.pokemon[0];
+			if (trainer.pokemon.Count>1 && (Input.GetKey(KeyCode.Alpha2) ||  Input.GetKey(KeyCode.Keypad2)))	pokemon = trainer.pokemon[1];
+			if (trainer.pokemon.Count>2 && (Input.GetKey(KeyCode.Alpha3) ||  Input.GetKey(KeyCode.Keypad3)))	pokemon = trainer.pokemon[2];
+			if (trainer.pokemon.Count>3 && (Input.GetKey(KeyCode.Alpha4) ||  Input.GetKey(KeyCode.Keypad4)))	pokemon = trainer.pokemon[3];
+			if (trainer.pokemon.Count>4 && (Input.GetKey(KeyCode.Alpha5) ||  Input.GetKey(KeyCode.Keypad5)))	pokemon = trainer.pokemon[4];
+			if (trainer.pokemon.Count>5 && (Input.GetKey(KeyCode.Alpha6) ||  Input.GetKey(KeyCode.Keypad6)))	pokemon = trainer.pokemon[5];
+			if (trainer.pokemon.Count>6 && (Input.GetKey(KeyCode.Alpha7) ||  Input.GetKey(KeyCode.Keypad7)))	pokemon = trainer.pokemon[6];
+			if (trainer.pokemon.Count>7 && (Input.GetKey(KeyCode.Alpha8) ||  Input.GetKey(KeyCode.Keypad8)))	pokemon = trainer.pokemon[7];
+			if (trainer.pokemon.Count>8 && (Input.GetKey(KeyCode.Alpha9) ||  Input.GetKey(KeyCode.Keypad9)))	pokemon = trainer.pokemon[8];
+			if (trainer.pokemon.Count>9 && (Input.GetKey(KeyCode.Alpha0) ||  Input.GetKey(KeyCode.Keypad0)))	pokemon = trainer.pokemon[9];
 			if (Input.GetKey(KeyCode.PageUp) || Input.GetKey(KeyCode.Comma) || Input.GetKey(KeyCode.Minus) || Input.GetKey(KeyCode.KeypadMinus)){
-				if (Pokemon.selected==Pokemon.party[0])
-					Pokemon.selected = Pokemon.party[Pokemon.party.Count-1];
+				if (pokemon==trainer.pokemon[0])
+					pokemon = trainer.pokemon[trainer.pokemon.Count-1];
 				else
-					if (Pokemon.party.Contains(Pokemon.selected))	Pokemon.selected = Pokemon.party[Pokemon.party.IndexOf(Pokemon.selected)-1];
+					if (trainer.pokemon.Contains(pokemon))	pokemon = trainer.pokemon[trainer.pokemon.IndexOf(pokemon)-1];
 			}
 			if (Input.GetKey(KeyCode.PageDown) || Input.GetKey(KeyCode.Period) || Input.GetKey(KeyCode.Plus)|| Input.GetKey(KeyCode.KeypadPlus)){
-				if (Pokemon.selected==Pokemon.party[Pokemon.party.Count-1])
-					Pokemon.selected = Pokemon.party[0];
+				if (pokemon==trainer.pokemon[trainer.pokemon.Count-1])
+					pokemon = trainer.pokemon[0];
 				else
-					if (Pokemon.party.Contains(Pokemon.selected))	Pokemon.selected = Pokemon.party[Pokemon.party.IndexOf(Pokemon.selected)+1];
+					if (trainer.pokemon.Contains(pokemon))	pokemon = trainer.pokemon[trainer.pokemon.IndexOf(pokemon)+1];
 			}
-			if (oldPokemonSelection!=Pokemon.selected){
+			if (oldPokemonSelection!=pokemon){
 				click = true;
-				if (pokemonObj!=null){
-					pokemonObj.GetComponent<PokemonObj>().Return();
-					ThrowPokemon();
+				if (oldPokemonSelection.obj!=null){
+					oldPokemonSelection.obj.Return();
+					trainer.ThrowPokemon(pokemon);
 				}
 			}
 		}
 
-		if (!Pokemon.party.Contains(Pokemon.selected))		Pokemon.selected = null;
-		if (Pokemon.selected==null && Pokemon.party.Count>0)		Pokemon.selected = Pokemon.party[0];
+		if (!trainer.pokemon.Contains(pokemon))				pokemon = null;
+		if (pokemon==null && trainer.pokemon.Count>0)		pokemon = trainer.pokemon[0];
 
-		if (!Item.inventory.Contains(Item.selected))		Item.selected = null;
-		if (Item.selected==null && Item.inventory.Count>0)	Item.selected = Item.inventory[0];
+		if (!trainer.inventory.Contains(item))			item = null;
+		if (item==null && trainer.inventory.Count>0)	item = trainer.inventory[0];
 
-		//release pokemon
+		//throw pokemon
 		if (!click && Input.GetKey(KeyCode.Return)){
-			if (pokemonObj==null){
-				if (!pokemonActive && Pokemon.selected!=null)	ThrowPokemon();
+			if (pokemon.obj==null){
+				trainer.ThrowPokemon(pokemon);
 			}else{
 				if (pokemonActive){
-					pokemonObj.GetComponent<PokemonObj>().Return();
+					pokemon.obj.Return();
 					pokemonActive = false;
 				}else{
 					pokemonActive = true;
@@ -177,27 +189,10 @@ public class Player : MonoBehaviour {
 			&& !Input.GetKey(KeyCode.Return) && !Input.GetKey(KeyCode.Escape)
 		    && !Input.GetMouseButton(0) && !Input.GetMouseButton(1))
 			click = false;
-
-		//inventoryMGR
-		for(int i=0; i<Item.inventory.Count; i++){
-			if (Item.inventory[i].number<=0)	Item.inventory.Remove(Item.inventory[i]);
-		}
-	}
-
-	public static void ThrowPokemon(){
-		if (pokemonActive)	return;
-		GameObject ball = (GameObject)Instantiate(Resources.Load("Pokeball"));
-		ball.transform.position = GameObject.Find("_PokeballHolder").transform.position;
-		ball.rigidbody.AddForce
-			( Camera.main.transform.forward*500+ Camera.main.transform.up*300 );
-		ball.GetComponent<Pokeball>().pokemon = Pokemon.selected;
-		ball.GetComponent<Pokeball>().trainer = This.gameObject;
-		pokemonActive = true;
-		click = true;
-		gamegui.SetChatWindow(ball.GetComponent<Pokeball>().pokemon.GetName() + "! I choose you!");
 	}
 
 	public static void CapturePokemon(){
+		/*
 		GameGUI gamegui = new GameGUI();
 		Debug.LogError("Capture Pokemon");
 		Vector3 pokemonPositon = pokemonObj.transform.position;
@@ -209,37 +204,38 @@ public class Player : MonoBehaviour {
 		//	( Camera.main.transform.forward*500+ Camera.main.transform.up*300 );
 		ball.rigidbody.AddForce(pokemonPositon*500 + Camera.main.transform.up*300);
 		Pokeball.CapturePokemon();
-		Destroy (ball, 1);
+		Destroy (ball, 1);*/
 	}
 
 	void LateUpdate(){
-		Quaternion camRot = Camera.main.transform.rotation;
+		Quaternion camRot = transform.rotation;
 
 		if (Dialog.NPCobj=null){
 			//focus on person speaking to you
 			Vector3 camFocus = Dialog.NPCobj.transform.position+Vector3.up;
-			Camera.main.transform.rotation = Quaternion.LookRotation(Camera.main.transform.position-camFocus);
+			transform.rotation = Quaternion.LookRotation(transform.position-camFocus);
 		}else{
-			if (pokemonObj!=null && pokemonActive){
+			if (pokemon.obj!=null && pokemonActive){
 				//focus on current pokemon
-				Camera.main.transform.rotation = pokemonObj.transform.rotation * Quaternion.Euler(ax,0,0);
+				cameraFocus = pokemon.obj.transform.position + Vector3.up;
+				transform.rotation = pokemon.obj.transform.rotation * Quaternion.Euler(ax,0,0);
 			}else{
 				//focus on player
-				cameraFocus = transform.position+Vector3.up*2;
-				Camera.main.transform.rotation = Quaternion.Euler(ax,ay,0);
+				cameraFocus = trainer.transform.position+Vector3.up*2;
+				transform.rotation = Quaternion.Euler(ax,ay,0);
 			}
 		}
-		Camera.main.transform.position = cameraFocus;
-		Camera.main.transform.Translate(0,0,-cameraZoom);
+		transform.position = cameraFocus;
+		transform.Translate(0,0,-cameraZoom);
 
-		Camera.main.transform.position = Vector3.Lerp(camPos, Camera.main.transform.position, Time.deltaTime*5);
-		Camera.main.transform.rotation = Quaternion.Lerp(camRot, Camera.main.transform.rotation, Time.deltaTime*5);
-		camPos = Camera.main.transform.position;
+		transform.position = Vector3.Lerp(camPos, transform.position, Time.deltaTime*5);
+		transform.rotation = Quaternion.Lerp(camRot, transform.rotation, Time.deltaTime*5);
+		camPos = transform.position;
 
 		RaycastHit hit;
-		Vector3 camDirect = Camera.main.transform.position - cameraFocus;
+		Vector3 camDirect = transform.position - cameraFocus;
 		if (Physics.Raycast(cameraFocus, camDirect, out hit, camDirect.magnitude, 1)){
-			Camera.main.transform.position = hit.point - camDirect.normalized*0.5f;
+			transform.position = hit.point - camDirect.normalized*0.5f;
 		}
 	}
 }
