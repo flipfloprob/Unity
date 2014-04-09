@@ -11,17 +11,18 @@ public class Player : MonoBehaviour {
 	public static Item item = null;
 	public static bool pokemonActive = false;
 
-	public static float ax = 0;
-	public static float ay = 0;
-	public static Vector3 cameraFocus = Vector3.zero;
+	//public static float ax = 0;
+	//public static float ay = 0;
+	//public static Vector3 cameraFocus = Vector3.zero;
 
-	Vector3 camPos = Vector3.zero;
-	float cameraZoom = 6;
+	//Vector3 camPos = Vector3.zero;
+	//float cameraZoom = 6;
 
 	public static GameGUI gamegui = new GameGUI();
 
 	void Start(){
 		trainer = GameObject.Find("Player").GetComponent<Trainer>();
+		gameObject.AddComponent ("CameraControl");
 	}
 
 	void Update(){
@@ -41,7 +42,7 @@ public class Player : MonoBehaviour {
 			Screen.lockCursor = true;
 			Screen.showCursor = false;
 		}
-
+	/*
 		//camera input
 		if (!GameGUI.menuActive || Input.GetMouseButton(1)){
 			ax -= Input.GetAxis("Mouse Y")*5;
@@ -49,7 +50,7 @@ public class Player : MonoBehaviour {
 			ax = Mathf.Clamp(ax,-80,80);
 			ay = ay%360;
 		}
-		
+	*/	
 		//player control
 		if (pokemonActive && pokemon.obj!=null){
 			//move pokemon
@@ -77,7 +78,7 @@ public class Player : MonoBehaviour {
 
 		}else{
 			//move trainer
-			Vector3 vel = Quaternion.Euler(0,ay,0) * (Vector3.forward*Input.GetAxis("Vertical") + Vector3.right*Input.GetAxis("Horizontal"));
+			Vector3 vel = Quaternion.Euler(0,CameraControl.ay,0) * (Vector3.forward*Input.GetAxis("Vertical") + Vector3.right*Input.GetAxis("Horizontal"));
 			trainer.SetVelocity(vel);
 		}
 
@@ -206,7 +207,7 @@ public class Player : MonoBehaviour {
 		Pokeball.CapturePokemon();
 		Destroy (ball, 1);*/
 	}
-
+/*
 	void LateUpdate(){
 		Quaternion camRot = transform.rotation;
 
@@ -238,4 +239,5 @@ public class Player : MonoBehaviour {
 			transform.position = hit.point - camDirect.normalized*0.5f;
 		}
 	}
+*/
 }
