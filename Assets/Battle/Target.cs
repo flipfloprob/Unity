@@ -119,13 +119,13 @@ public class Target : MonoBehaviour {
 	}
 
 	public void HighlightTarget() {
-		gamegui.SetChatWindow ("highlighting");
+		//gamegui.SetChatWindow ("highlighting");
 		highlightSparkles = (GameObject)Instantiate (Resources.Load ("ReturnEffect"));
 		SetActiveTarget (true);
 	}
 
 	public void UnHighlightTarget() {
-		gamegui.SetChatWindow ("un highlighting");
+		//gamegui.SetChatWindow ("un highlighting");
 		targetedPokemon = null;
 		SetActiveTarget (false);
 		/*
