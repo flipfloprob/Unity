@@ -1,9 +1,9 @@
 .DS_Store
 Library
 Temp
-*.csproj
 *.pidb
 *.unityproj
-*.sln
 *.userprefs
-Thumbs.db*
+*.suo
+Debug
+Release
