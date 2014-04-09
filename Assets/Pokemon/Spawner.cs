@@ -26,6 +26,7 @@ public class Spawner : MonoBehaviour {
 			int thisLevel = level + Random.Range(-2,3);
 			newPokemon.GetComponent<PokemonObj>().pokemon = new Pokemon(Pokemon.GetNumber(newPokemon.name), false, thisLevel);
 			spawned.Add(newPokemon);
+			newPokemon.transform.parent = transform;
 		}
 	}
 }
