@@ -8,10 +8,8 @@
 using UnityEngine;
 using System.Collections;
 
-public class DataQuery
-{
-	public void GetPokemon(int maxID, int minID)
-	{
+public class DataQuery {
+	public void GetPokemon(int maxID, int minID) {
 		//Placeholder
 	}
 }
