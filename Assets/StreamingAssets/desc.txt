@@ -1,0 +1,1 @@
+AK: Do not delete the folder (StreamingAssets) or any of the enclosed paths. The folder and its contents are required in the Wwise Unity Integration unitypackage to avoid DirectoryNotFoundException on Unity Editor for Windows when there is no such a folder in the active Unity project, and this folder also contains all the soundbanks!
