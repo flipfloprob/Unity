@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GUImgr{
+static public class GUImgr{
 	public static Texture2D blank;
 	public static Texture2D hp;
 	public static Texture2D pp;
@@ -19,23 +19,23 @@ public class GUImgr{
 		GUI.DrawTexture(subRect, blank);
 	}
 
-	public static void Start(){
+	static GUImgr(){
 		blank = new Texture2D(1,1);
 		blank.SetPixel(0,0, new Color(0.2f,0.2f,0.2f,0.5f));
 		blank.Apply();
-
+		
 		hp = new Texture2D(1,1);
 		hp.SetPixel(0,0, new Color(1,0.1f,0.1f,0.8f));
 		hp.Apply();
-
+		
 		pp = new Texture2D(1,1);
 		pp.SetPixel(0,0, new Color(0,0.8f,0,0.8f));
 		pp.Apply();
-
+		
 		xp = new Texture2D(1,1);
 		xp.SetPixel(0,0, new Color(0.2f,0.5f,1,0.8f));
 		xp.Apply();
-
+		
 		gradRight = new Texture2D(100,1);
 		gradLeft = new Texture2D(100,1);
 		gradDown = new Texture2D(1,100);

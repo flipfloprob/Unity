@@ -1,15 +1,14 @@
 /*
- * Defines all the type/event identifiers and binary flag values for bitwise operations.
- * These identifiers can be used to retrieve the their readable name counterparts and descriptions.
+ * Defines all the type/event identifiers as well as binary flag values for bitwise operations.
+ * 
  * Use: Identifiers.BERRY_FIRMNESS.HARD
- * You may also ommit the 'Identifiers' name in files by specifying: 'using Identifiers;'
+ * You may ommit the 'Identifiers' name in files by specifying: 'using Identifiers;'
  * 
 */
 
 namespace Identifiers {
 	enum BERRY_FIRMNESS {VERY_SOFT = 1, SOFT, HARD, VERY_HARD, SUPER_HARD};
-	
-	//Breeding Compatibility
+		//Breeding Compatibility
 	enum EGG_GROUP {MONSTER = 1, WATER1, BUG, FLYING, GROUND, FAIRY, PLANT, HUMANSHAPE, WATER3, MINERAL, INDETERMINATE, WATER2, DITTO, DRAGON, NO_EGGS};
 	
 	enum ENCOUNTER_METHOD {WALK = 1, OLD_ROD, GOOD_ROD, SUPER_ROD, SURF, ROCK_SMASH, HEADBUTT, DARK_GRASS, GRASS_SPOTS, CAVE_SPOTS, BRIDGE_SPOTS, SUPER_ROD_SPOTS, SURF_SPOTS};
@@ -17,8 +16,7 @@ namespace Identifiers {
 	enum EVOLUTION_TRIGGER {LEVEL_UP = 1, TRADE, USE_ITEM, SHED};
 	
 	enum GENDER {FEMALE = 1, MALE, GENDERLESS};
-	
-	//Leveling Rate - Can identify to find formulas
+		//Leveling Rate, can be used identify formulas in the database
 	enum GROWTH_RATE {SLOW = 1, MEDIUM, FAST, MEDIUM_SLOW, SLOW_THEN_VERY_FAST, FAST_THEN_VERY_SLOW};
 	
 	enum ITEM_FLAG {COUNTABLE = 1, CONSUMABLE, USABLE_OUTSIDE_BATTLE, USABLE_IN_BATTLE, HOLDABLE, HOLDABLE_PASSIVE, HOLDABLE_ACTIVE, UNDERGROUND};
@@ -38,13 +36,11 @@ namespace Identifiers {
 	enum MOVE_META_AILMENT {UNKNOWN = -1, NONE = 0, PARALYSIS = 1, SLEEP, FREEZE, BURN, POISON, CONFUSION, INFACTUATION, TRAP, NIGHTMARE, TORMENT, DISABLE, YAWN, HEAL_BLOCK, NO_TYPE_IMMUNITY, LEECH_SEED, EMBARGO, PERISH_SONG, INGRAIN};
 	
 	enum MOVE_META_CATEGORY {DAMAGE = 0, AILMENT = 1, STAT_CHANGE, HEAL, DAMAGE_AND_AILMENT, SWAGGER, DAMAGE_AND_LOWER_STATS, DAMAGE_AND_RAISE_OWN_STATS, DAMAGE_AND_ABSORB_HEALTH, ONE_HIT_KO, FIELD_EFFECT, FORCE_POKEMON_SWITCH, UNIQUE};
-	
-	//Used in Pokedex and group type favorable color associations
+		//Used in Pokedex and group type favorable color associations
 	enum POKEMON_COLOR {BLACK = 1, BLUE, BROWN, GRAY, GREEN, PINK, PURPLE, RED, WHITE, YELLOW};
 	
 	enum POKEMON_HABITAT {CAVE = 1, FOREST, GRASSLAND, MOUNTAIN, RARE, ROUGH_TERRAIN, SEA, URBAN, WATERS_EDGE};
-	
-	//Apparently if you beat a series of challenges, your Pikachu in this event can learn to surf..
+		//Apparently if you beat a series of challenges, your Pikachu in this event can learn to surf..
 	enum POKEMON_MOVE_METHOD {LEVEL_UP = 1, EGG_HATCHED, LEARNT_MOVE, TAUGHT_MACHINE, PIKACHU_LEARNT_SURF, PICHU_LIGHT_BALL_VOLT_TACKLE, DARK_TATTOO_COLOSSEUM_PURIFICATION, DARK_TATTOO_XD_SHADOW, DARK_TATTOO_XD_PURIFICATION, ROTOM_FORM_EXCLUSIVE_MOVE};
 	
 	enum POKEMON_SHAPE {BALL = 1, SQUIGGLE, FISH, ARMS, BLOG, UPRIGHT, LEGS, QUADRUPED, WINGS, TENTACLES, HEADS, HUMANOID, BUG_WINGS, ARMOR};

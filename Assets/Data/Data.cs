@@ -1,5 +1,5 @@
 /*
- * This class binds the database's contents to native C# objects.
+ * This class integrates clockwork's objects into the project.
  */
 
 using UnityEngine;
@@ -7,21 +7,21 @@ using System.Collections;
 
 public class Data
 {
-	static public bool hasLoaded {get;set;}
+	//static public bool hasLoaded {get;set;}
 	
 	static Data() {
-		hasLoaded = false;
+		//hasLoaded = false;
 	}
 	
 	//Connect to the database, query, record data and then DataQuery is be destroyed
 	static public void Init() {
 		//Remember to assert the loading of database and use try around the queries
-		DataQuery query = new DataQuery();
-		hasLoaded = true; //This will go in the final area postceeding try-catch
+		//DataQuery query = new DataQuery();
+		//hasLoaded = true; //This will go in the final area postceeding try-catch
 	}
 	
 	//Will free upon leaving through the menu.
 	static public void Free() {
-		hasLoaded = false;
+		//hasLoaded = false;
 	}
 }

@@ -4,8 +4,7 @@ using System.Collections;
 public class Pokeball : MonoBehaviour {
 	public Trainer trainer = null;
 	public Pokemon pokemon = null;
-
-	public bool active = true;
+	public bool isActive = true;  //MonoBehaviour also defines a field called active, which has a different purpose. Use the 'new' keyword if you decide to call it active.
 	bool fired = false;
 	static GameGUI gamegui = new GameGUI();
 

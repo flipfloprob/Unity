@@ -11,7 +11,6 @@ public class MenuScene : MonoBehaviour {
 	bool click = true;
 
 	void Start(){
-		GUImgr.Start();
 	}
 
 	void Update(){
