@@ -11,6 +11,15 @@ public class CameraControl : MonoBehaviour {
 	Trainer trainer = null;
 	Vector3 camPos = Vector3.zero;
 	float cameraZoom = 6;
+	public static bool releaseCursor = false;
+	Target activeTarget;
+	//public GameGUI gamegui = new GameGUI();
+
+
+	void Start() {
+		//activeTarget = GetComponent<Target>();
+		gameObject.AddComponent ("Target");
+	}
 
 	void Update() {
 		//camera input
@@ -19,6 +28,33 @@ public class CameraControl : MonoBehaviour {
 			ay += Input.GetAxis("Mouse X")*5;
 			ax = Mathf.Clamp(ax,-80,80);
 			ay = ay%360;
+		}
+
+		//release cursor true so you can click on stuff
+		if (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)) {
+			releaseCursor = true;
+			if (Input.GetMouseButtonDown(0)){ // when button clicked...
+				RaycastHit hit; // cast a ray from mouse pointer:
+				Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+				// if enemy hit...
+				if (Physics.Raycast(ray, out hit) && hit.transform.CompareTag("pokemon")){
+					//gamegui.SetChatWindow("Found");
+					if (activeTarget.GetActiveTarget()) {
+						activeTarget.UnHighlightTarget();
+					}
+					activeTarget.SetTarget(hit.transform);
+					activeTarget.HighlightTarget();
+				}
+			}
+		}
+		//Capture cursor
+		if (Input.GetKeyUp (KeyCode.LeftAlt) || Input.GetKeyUp(KeyCode.RightAlt)) {
+			releaseCursor = false;
+		}
+
+		//Zoom camera in/out with mouse scrollwheel
+		if (Input.GetAxis ("Mouse ScrollWheel")!=0) {
+			cameraZoom-=(Input.GetAxis("Mouse ScrollWheel")*4);
 		}
 	}
 
@@ -33,14 +69,19 @@ public class CameraControl : MonoBehaviour {
 			Vector3 camFocus = Dialog.NPCobj.transform.position+Vector3.up;
 			transform.rotation = Quaternion.LookRotation(transform.position-camFocus);
 		}else{
-			if (pokemon.obj!=null && pokemonActive){
+			if (pokemon!=null && pokemonActive && !releaseCursor) {
 				//focus on current pokemon
 				cameraFocus = pokemon.obj.transform.position + Vector3.up;
 				transform.rotation = pokemon.obj.transform.rotation * Quaternion.Euler(ax,0,0);
-			}else{
+			}
+			else if (releaseCursor) {
+				//do nothing
+				//keep camera steady and let user click around
+			}
+			else{
 				//focus on player
 				cameraFocus = trainer.transform.position+Vector3.up*2;
-				transform.rotation = Quaternion.Euler(ax,ay,0);
+				Camera.main.transform.rotation = Quaternion.Euler(ax,ay,0);
 			}
 		}
 		transform.position = cameraFocus;
