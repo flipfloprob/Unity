@@ -14,26 +14,29 @@ public class Pokemon{
 	public Texture2D icon = null;
 	public List<Move> moves = new List<Move>();
 	public bool isPlayer = false;
-
-	public int health = 10;
-	public int attack = 10;
-	public int defence = 10;
-	public int speed = 10;
+	
+	public float health = 10;
+	public float attack = 10;
+	public float defence = 10;
+	public float speed = 10;
 	public Item heldItem = null;
-
+	
 	public Pokemon(int number, bool isPlayer){
 		this.number = number;
 		this.isPlayer = isPlayer;
 		name = GetName(number);
 		icon = GetIcon(number);
 		level = 5;
-
+		
 		hp = 1;
+		attack = TotalAttack();
+		defence = TotalDefence();
+		speed = TotalSpeed ();
 		pp = 1;
 		xp = Random.value;
 		PopulateMoves();
 	}
-
+	
 	public Pokemon(int number, bool isPlayer, int level){
 		Debug.Log("New "+GetName(number));
 		this.number = number;
@@ -46,54 +49,86 @@ public class Pokemon{
 		pp = 1;
 		PopulateMoves();
 	}
-
+	
 	public void Damage(Pokemon otherPoke, Move move){
 		//this must take into account weakness and attributes (defense, attack, sp_Defense, sp_Attack)
 		//this must be object oriented
-		float damage = 1;
-		hp -= damage/(float)TotalHP();	//replace with some elabourate forumla
-		GiveXP(10);
+		switch(move.moveType){ //These attack type and stab are not included. They(included atkpower) will have to be be invoked directly from database and switch wont be required
+			case MoveNames.Tackle:{
+			int atkPower = 35;
+			float damage = ((((2 * otherPoke.level / 5 + 2) * otherPoke.attack * atkPower / defence) / 50) + 2) * Random.Range(217,255)/255; //((2A/5+2)*B*C)/D)/50)+2)*X)*Y/10)*Z)/255
+			hp -= damage/TotalHP();	
+			GiveXP(10);
+			break;
+			}
+		case MoveNames.Scratch:{
+			int atkPower = 35;
+			float damage = ((((2 * otherPoke.level / 5 + 2) * otherPoke.attack * atkPower / defence) / 50) + 2) * Random.Range(217,255)/255; //((2A/5+2)*B*C)/D)/50)+2)*X)*Y/10)*Z)/255
+			hp -= damage/TotalHP();	
+			GiveXP(10);
+			break;
+			}
+		}
 	}
-	public int TotalHP(){
-		return (Pokemon_BaseStats.Health((Pokemon_Names)number)+50)*level/50 + 10;
+	
+	public void DeBuff(Pokemon otherPoke, Move move){
+		switch(move.moveType){
+		case MoveNames.Growl:{
+			float AttackedLowered = .7f;//unofficial amount . Stacking will be required to get new levels of buff
+			attack = attack * AttackedLowered;
+			GiveXP(10);
+			break;		
+			
+		}
+		case MoveNames.TailWhip:{
+			float DefenceLowered = .7f; //unofficial amount
+			defence = defence * DefenceLowered;	//replace with some elabourate forumla
+			GiveXP(10);
+			break;		
+		    }
+		}
 	}
-	public int TotalAttack(){
+	//changed Return types must be float. And then rounded up to int when displaying
+	public float TotalHP(){
+		return (Pokemon_BaseStats.Health((Pokemon_Names)number)+50)*level/50 + 10; 
+	}
+	public float TotalAttack(){
 		return (Pokemon_BaseStats.Attack((Pokemon_Names)number))*level/50 + 5;
 	}
-	public int TotalDefence(){
+	public float TotalDefence(){
 		return (Pokemon_BaseStats.Defence((Pokemon_Names)number))*level/50 + 5;
 	}
-	public int TotalSpeed(){
+	public float TotalSpeed(){
 		return (Pokemon_BaseStats.Speed((Pokemon_Names)number))*level/50 + 5;
 	}
 	public string GetName() {
 		return this.name;
 	}
-
+	
 	public void PopulateMoves(){
 		switch(number){
-
+			
 		case 1:		//Bulbasaur
 			moves.Add(new Move(MoveNames.Tackle));
 			moves.Add(new Move(MoveNames.Growl));
 			if (level>=7)	moves.Add(new Move(MoveNames.LeechSeed));
-            if (level>=9)	moves.Add(new Move(MoveNames.VineWhip));
+			if (level>=9)	moves.Add(new Move(MoveNames.VineWhip));
 			break;
-
+			
 		case 4:		//Charmander
 			moves.Add(new Move(MoveNames.Scratch));
-			 moves.Add(new Move(MoveNames.Growl));
+			moves.Add(new Move(MoveNames.Growl));
 			if (level>=7)	moves.Add(new Move(MoveNames.Ember));
 			if (level>=10)	moves.Add(new Move(MoveNames.Smokescreen));
 			break;
-
+			
 		case 7:		//Squirtle
 			moves.Add(new Move(MoveNames.Tackle));
 			moves.Add(new Move(MoveNames.TailWhip));
 			if (level>=7)	moves.Add(new Move(MoveNames.WaterGun));
 			if (level>=10)	moves.Add(new Move(MoveNames.Withdraw));
 			break;
-
+			
 		case 19:	//Rattata
 			moves.Add(new Move(MoveNames.Tackle));
 			moves.Add(new Move(MoveNames.TailWhip));
@@ -101,10 +136,10 @@ public class Pokemon{
 			if (level>=7)	moves.Add(new Move(MoveNames.FocusEnergy));
 			if (level>=10)	moves.Add(new Move(MoveNames.Bite));
 			break;
-
+			
 		}
 	}
-
+	
 	static int XPtoNextLevel(int level){
 		return level*level*level;
 	}
@@ -116,7 +151,7 @@ public class Pokemon{
 			xp = excessXP/(float)XPtoNextLevel(level);
 		}
 	}
-
+	
 	public static string GetName(int number){
 		//instead of doing this it would be much easier to pass in a pokemon and take it's name from its inherent method
 		switch(number){
@@ -138,7 +173,7 @@ public class Pokemon{
 		}
 		return 0;
 	}
-
+	
 	public static Texture2D GetIcon(int number){
 		return (Texture2D)Resources.Load("Icons/"+GetName(number));
 	}
