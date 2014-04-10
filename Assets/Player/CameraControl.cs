@@ -13,6 +13,8 @@ public class CameraControl : MonoBehaviour {
 	float cameraZoom = 6;
 	public static bool releaseCursor = false;
 	Target activeTarget;
+	//public GameGUI gamegui = new GameGUI();
+
 
 	void Start() {
 		//activeTarget = GetComponent<Target>();
@@ -28,7 +30,7 @@ public class CameraControl : MonoBehaviour {
 			ay = ay%360;
 		}
 
-		//release cursor while pokemonActive is true
+		//release cursor true so you can click on stuff
 		if (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)) {
 			releaseCursor = true;
 			if (Input.GetMouseButtonDown(0)){ // when button clicked...
@@ -36,7 +38,7 @@ public class CameraControl : MonoBehaviour {
 				Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 				// if enemy hit...
 				if (Physics.Raycast(ray, out hit) && hit.transform.CompareTag("pokemon")){
-					Player.gamegui.SetChatWindow("Found");
+					//gamegui.SetChatWindow("Found");
 					if (activeTarget.GetActiveTarget()) {
 						activeTarget.UnHighlightTarget();
 					}
@@ -45,8 +47,14 @@ public class CameraControl : MonoBehaviour {
 				}
 			}
 		}
+		//Capture cursor
 		if (Input.GetKeyUp (KeyCode.LeftAlt) || Input.GetKeyUp(KeyCode.RightAlt)) {
 			releaseCursor = false;
+		}
+
+		//Zoom camera in/out with mouse scrollwheel
+		if (Input.GetAxis ("Mouse ScrollWheel")!=0) {
+			cameraZoom-=(Input.GetAxis("Mouse ScrollWheel")*4);
 		}
 	}
 
@@ -72,7 +80,6 @@ public class CameraControl : MonoBehaviour {
 			}
 			else{
 				//focus on player
-				//cameraFocus = transform.position+Vector3.up*2;
 				cameraFocus = trainer.transform.position+Vector3.up*2;
 				Camera.main.transform.rotation = Quaternion.Euler(ax,ay,0);
 			}
