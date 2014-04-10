@@ -17,7 +17,6 @@ public class Player : MonoBehaviour {
 
 	void Start(){
 		if (Pokemon.party.Count == 0) {
-			GUImgr.Start ();
 			This = this;
 			Pokemon.party.Add (new Pokemon (1, true));
 			Pokemon.party.Add (new Pokemon (4, true));
