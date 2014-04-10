@@ -22,7 +22,7 @@ public class Trainer : MonoBehaviour {
 		switch(currentState){
 
 		case States.Ready:{
-			Vector3 direct = Player.This.transform.position - transform.position;
+			Vector3 direct = Player.This.transform.position - transform.position; //Null reference exception crash is thrown here (assertion failed)
 			if (direct.sqrMagnitude<10*10 && Vector3.Dot(direct, transform.forward)>0){
 
 				Dialog.inDialog = true;

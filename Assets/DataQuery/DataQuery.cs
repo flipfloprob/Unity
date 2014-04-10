@@ -6,7 +6,7 @@ using UnityEngine;
 using System.Collections;
 
 public class DataQuery {
-	DataQuery() {
+	public DataQuery() {
 	}
 
 	~DataQuery() {
