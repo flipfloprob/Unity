@@ -19,7 +19,7 @@ static public class GUImgr{
 		GUI.DrawTexture(subRect, blank);
 	}
 
-	static GUImgr(){
+	public static void Start(){
 		blank = new Texture2D(1,1);
 		blank.SetPixel(0,0, new Color(0.2f,0.2f,0.2f,0.5f));
 		blank.Apply();
